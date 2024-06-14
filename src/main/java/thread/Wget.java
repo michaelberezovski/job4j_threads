@@ -1,6 +1,5 @@
 package thread;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -20,22 +19,17 @@ public class Wget implements Runnable {
     @Override
     public void run() {
         var startAt = System.currentTimeMillis();
-        var file = new File("tmp.xml");
-        String url = "https://raw.githubusercontent.com/peterarsentev/course_test/master/pom.xml";
         try (var input = new URL(url).openStream();
-             var output = new FileOutputStream(file)) {
+             var output = new FileOutputStream(fileForDownload)) {
             System.out.println("Open connection: " + (System.currentTimeMillis() - startAt) + " ms");
             var dataBuffer = new byte[1024];
             int bytesRead;
-            double time;
-            double speed;
+            long allBytes = 0;
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
-                var downloadAt = System.nanoTime();
                 output.write(dataBuffer, 0, bytesRead);
-                time = System.nanoTime() - downloadAt;
-                speed = (dataBuffer.length / time) * 1000000;
-                if (speed > 1000) {
-                    long sleepTime = (long) speed / 1000;
+                allBytes += bytesRead;
+                if (allBytes >= speed) {
+                    long sleepTime = allBytes / 1000;
                     Thread.sleep(sleepTime);
                 }
             }
@@ -46,11 +40,10 @@ public class Wget implements Runnable {
         }
     }
 
-    private void createFile(String name) {
-        File file = new File("src/main/java/thread/" + name);
-    }
-
     public static void main(String[] args) throws InterruptedException {
+        if (args.length != 3) {
+            throw new IllegalArgumentException("Wrong number of CLI arguments");
+        }
         String urlStr = args[0];
         try {
             URL url = new URL(urlStr);
