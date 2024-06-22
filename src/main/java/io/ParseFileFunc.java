@@ -5,49 +5,36 @@ import java.util.function.Predicate;
 
 public class ParseFileFunc {
 
-    public String content(File file, Predicate<Character> filter) throws IOException {
-        String output;
-        try (InputStream input = new FileInputStream(file)) {
-            output = "";
-            int data;
-            while ((data = input.read()) > 0) {
-                output += (char) data;
-            }
-        }
-        return output;
+    private File file;
+
+    public synchronized void fileConstructor(File file) {
+        this.file = file;
     }
 
-    public String getContent(File file) throws IOException {
-        String output;
-        try (InputStream input = new FileInputStream(file)) {
-            output = "";
-            int data;
-            while ((data = input.read()) > 0) {
-                output += (char) data;
-            }
-        }
-        return output;
+    public synchronized File getFile() {
+        return file;
     }
 
-    public String getContentWithoutUnicode(File file) throws IOException {
-        String output;
+    public synchronized String getContent() {
+        return content(data -> true);
+    }
+
+    public synchronized String getContentWithoutUnicode() {
+        return content(data -> data < 128);
+    }
+
+    private synchronized String content(Predicate<Character> filter) {
+        StringBuilder builder = new StringBuilder();
         try (InputStream input = new FileInputStream(file)) {
-            output = "";
             int data;
-            while ((data = input.read()) > 0) {
-                if (data < 0x80) {
-                    output += (char) data;
+            while ((data = input.read()) != -1) {
+                if (filter.test((char) data)) {
+                    builder.append((char) data);
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return output;
-    }
-
-    public void saveContent(String content, File file) throws IOException {
-        try (OutputStream o = new FileOutputStream(file)) {
-            for (int i = 0; i < content.length(); i++) {
-                o.write(content.charAt(i));
-            }
-        }
+        return builder.toString();
     }
 }
