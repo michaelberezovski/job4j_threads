@@ -18,20 +18,21 @@ public class Wget implements Runnable {
 
     @Override
     public void run() {
-        var startAt = System.currentTimeMillis();
         try (var input = new URL(url).openStream();
              var output = new FileOutputStream(fileForDownload)) {
-            System.out.println("Open connection: " + (System.currentTimeMillis() - startAt) + " ms");
             var dataBuffer = new byte[1024];
             int bytesRead;
             long allBytes = 0;
+            long start = System.currentTimeMillis();
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
-                output.write(dataBuffer, 0, bytesRead);
                 allBytes += bytesRead;
                 if (allBytes >= speed) {
-                    long sleepTime = allBytes / 1000;
-                    Thread.sleep(sleepTime);
+                    long interval = System.currentTimeMillis() - start;
+                    if (interval < 1000) {
+                        Thread.sleep(1000 - interval);
+                    }
                 }
+                output.write(dataBuffer, 0, bytesRead);
             }
         } catch (IOException e) {
             e.printStackTrace();
