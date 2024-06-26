@@ -34,5 +34,6 @@ public class ParallelSearch {
                 }
 
         ).start();
+        consumer.interrupt();
     }
 }
