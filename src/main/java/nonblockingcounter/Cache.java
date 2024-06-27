@@ -14,12 +14,18 @@ public class Cache {
     }
 
     public boolean update(Base model) throws OptimisticException {
-        Base stored = memory.get(model.id());
-        if (stored.version() != model.version()) {
-            throw new OptimisticException("Versions are not equal");
-        }
-        delete(model.id());
-        return add(model);
+        return memory.computeIfPresent(model.id(), (id, stored) -> {
+            if (stored.version() != model.version()) {
+                try {
+                    throw new OptimisticException("o");
+                } catch (OptimisticException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            delete(id);
+            add(model);
+            return model;
+        }) != null;
     }
 
     public void delete(int id) {

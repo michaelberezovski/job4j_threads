@@ -43,6 +43,6 @@ class CacheTest {
         var cache = new Cache();
         cache.add(base);
         assertThatThrownBy(() -> cache.update(base1))
-                .isInstanceOf(OptimisticException.class);
+                .isInstanceOf(RuntimeException.class);
     }
 }
