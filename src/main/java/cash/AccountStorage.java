@@ -29,9 +29,11 @@ public class AccountStorage {
 
     public synchronized boolean transfer(int fromId, int toId, int amount) {
         boolean transferred = false;
-        Account from = getById(fromId).get();
-        Account to = getById(toId).get();
-        if (getById(fromId).isPresent() && getById(toId).isPresent()) {
+        Optional<Account> fromOpt = getById(fromId);
+        Optional<Account> toOpt = getById(fromId);
+        if (fromOpt.isPresent() && toOpt.isPresent()) {
+            Account from = fromOpt.get();
+            Account to = toOpt.get();
             if (from.amount() >= amount) {
                 update(new Account(fromId, from.amount() - amount));
                 update(new Account(toId, to.amount() + amount));
