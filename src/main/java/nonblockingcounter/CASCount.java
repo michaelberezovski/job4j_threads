@@ -8,10 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CASCount {
     private final AtomicInteger count = new AtomicInteger();
 
-    private void setCount() {
-        count.set(0);
-    }
-
     public void increment() {
         int current;
         int upcoming;
