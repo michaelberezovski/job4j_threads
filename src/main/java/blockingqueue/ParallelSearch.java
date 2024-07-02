@@ -19,21 +19,22 @@ public class ParallelSearch {
         consumer.start();
         new Thread(
                 () -> {
-                    for (int index = 0; index != 3; index++) {
-                        try {
-                            queue.offer(index);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                    while (!Thread.currentThread().isInterrupted()) {
+                        for (int index = 0; index != 3; index++) {
+                            try {
+                                queue.offer(index);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
+                    consumer.interrupt();
                 }
-
         ).start();
-        consumer.interrupt();
     }
 }
