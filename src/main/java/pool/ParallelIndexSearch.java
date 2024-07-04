@@ -37,7 +37,7 @@ public class ParallelIndexSearch<T> extends RecursiveTask<Integer> {
         rightSearch.fork();
         int leftIndex = leftSearch.join();
         int rightIndex = rightSearch.join();
-        return null;
+        return rightIndex != -1 ? rightIndex : leftIndex;
     }
 
     public static <T> int search(T[] array, T elem) {
