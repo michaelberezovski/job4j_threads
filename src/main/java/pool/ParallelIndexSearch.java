@@ -27,7 +27,7 @@ public class ParallelIndexSearch<T> extends RecursiveTask<Integer> {
 
     @Override
     protected Integer compute() {
-        if (to - from + 1 <= 10) {
+        if (array.length < 10) {
             return linearSearch();
         }
         int middle = (from + to) / 2;
